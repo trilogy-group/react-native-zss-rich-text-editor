@@ -61,7 +61,8 @@ export const MessageConverter = (action) => {
     case `${actions.updateLink}`:
       return `zss_editor.updateLink('${action.data.url}', '${action.data.title}');`;
     case `${actions.insertImage}`:
-      return `zss_editor.insertImage(JSON.stringify(${action.data}));`;
+      const image = JSON.stringify(action.data);
+      return `zss_editor.insertImage(${image});`;
     case `${actions.setSubscript}`:
       return `zss_editor.setSubscript();`;
     case `${actions.setSuperscript}`:
