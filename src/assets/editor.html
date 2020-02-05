@@ -885,15 +885,19 @@
 				clearHtmlIfTextIsEmpty('zss_editor_content');
 
 				$(document).on('selectionchange',function(e){
-					console.log('selectionchange');
-					zss_editor.calculateEditorHeightWithCaretPosition();
-					zss_editor.setScrollPosition();
-					zss_editor.enabledEditingItems(e);
-					notifyIfSelectedTextHasChanged();
+					// add by xukj - fix cannot set bold/italic on android
+					if (document.getSelection() != '') {
+						zss_editor.log('selectionchange'); // log
+						zss_editor.calculateEditorHeightWithCaretPosition();
+						zss_editor.setScrollPosition();
+						zss_editor.enabledEditingItems(e);
+						notifyIfSelectedTextHasChanged();
+					}
 				});
 
 				// Make sure that when we tap anywhere in the document we focus on the editor
 				$(window).on('touchmove', function(e) {
+					zss_editor.log('touchmove'); // log
 					zss_editor.isDragging = true;
 					zss_editor.updateScrollOffset = true;
 					zss_editor.setScrollPosition();
@@ -903,7 +907,7 @@
 					zss_editor.isDragging = false;
 				});
 				$(window).on('scroll', function(e) {
-					if (zss_editor.platform === 'ios') {
+					if (zss_editor.isUsingiOS) {
 						zss_editor.updateOffset();
 					}
 				});
@@ -992,8 +996,11 @@
 
 
 			zss_editor.setScrollPosition = function() {
-				var position = window.pageYOffset;
-				ReactNativeWebView.postMessage(JSON.stringify({type: 'SCROLL', data: position}));
+				if (zss_editor.isUsingiOS) {
+					// add by xukj - fix error on android
+					var position = window.pageYOffset;
+					ReactNativeWebView.postMessage(JSON.stringify({type: 'SCROLL', data: position}));
+				}
 			}
 
 			function setPlaceholder(editorId, placeholder) {
@@ -1640,7 +1647,12 @@
 			}
 
 			zss_editor.setPlatform = function(platform) {
-				zss_editor.platform = platform;
+				zss_editor.isUsingiOS = (platform === 'ios');
+			}
+
+			// add by xukj - log
+			zss_editor.log = function(message) {
+				ReactNativeWebView.postMessage(JSON.stringify({ type: 'LOG', data: message }))
 			}
 
 			//end
