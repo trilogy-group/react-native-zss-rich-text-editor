@@ -122,6 +122,7 @@ export default class RichTextToolbar extends Component {
           data={this.state.dataSet}
           numColumns={this.state.actions.length}
           renderItem={(item) => this._renderAction(item.item.action, item.item.selected)}
+          keyExtractor={(item, index) => index}
         />
       </View>
     );
