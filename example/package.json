@@ -13,7 +13,8 @@
     "react": "16.9.0",
     "react-native": "0.61.5",
     "react-native-keyboard-spacer": "^0.4.1",
-    "react-native-zss-rich-text-editor": "https://github.com/kpReactComponent/react-native-zss-rich-text-editor.git"
+    "react-native-webview": "^8.1.2",
+    "react-native-zss-rich-text-editor": "https://github.com/philpettican/react-native-zss-rich-text-editor.git"
   },
   "devDependencies": {
     "@babel/core": "^7.7.7",
