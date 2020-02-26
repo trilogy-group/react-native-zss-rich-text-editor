@@ -1,9 +1,5 @@
-import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-// import WebViewBridge from 'react-native-webview-bridge-updated';
-import WebView from 'react-native-webview';
-import { MessageConverter } from './WebviewMessageHandler';
-import { actions, messages } from './const';
+import React, { Component } from 'react';
 import {
 	Modal,
 	View,
@@ -16,28 +12,26 @@ import {
 	Keyboard,
 	Dimensions,
 } from 'react-native';
-const resolveAssetSource = require('react-native/Libraries/Image/resolveAssetSource');
+import WebView from 'react-native-webview';
 
-// const injectScript = `
-//   (function () {
-//     ${InjectedMessageHandler}
-//   }());
-// `;
+import { actions, messages } from './const';
+import { MessageConverter } from './WebviewMessageHandler';
 
 const PlatformIOS = Platform.OS === 'ios';
 
 export default class RichTextEditor extends Component {
 	static propTypes = {
-		initialTitleHTML: PropTypes.string,
-		initialContentHTML: PropTypes.string,
 		titlePlaceholder: PropTypes.string,
+		initialTitleHTML: PropTypes.string,
+		hiddenTitle: PropTypes.bool,
 		contentPlaceholder: PropTypes.string,
+		initialContentHTML: PropTypes.string,
 		editorInitializedCallback: PropTypes.func,
 		customCSS: PropTypes.string,
-		hiddenTitle: PropTypes.bool,
 		enableOnChange: PropTypes.bool,
 		footerHeight: PropTypes.number,
 		contentInset: PropTypes.object,
+		autoFocusLinkModal: PropTypes.bool,
 	};
 
 	static defaultProps = {
@@ -261,6 +255,7 @@ export default class RichTextEditor extends Component {
 									this.setState({ linkTitle: text })
 								}
 								value={this.state.linkTitle}
+								autoFocus={this.props.autoFocusLinkModal}
 							/>
 						</View>
 						<Text style={[styles.inputTitle, { marginTop: 10 }]}>
@@ -377,7 +372,6 @@ export default class RichTextEditor extends Component {
 						this.webview = r;
 					}}
 					onMessage={message => this.onMessage(message)}
-					// injectedJavaScript={injectScript}
 					source={pageSource}
 					onLoad={() => this.init()}
 				/>
@@ -446,15 +440,19 @@ export default class RichTextEditor extends Component {
 	setTitleHTML(html) {
 		this._sendAction(actions.setTitleHtml, html);
 	}
+
 	hideTitle() {
 		this._sendAction(actions.hideTitle);
 	}
+
 	showTitle() {
 		this._sendAction(actions.showTitle);
 	}
+
 	toggleTitle() {
 		this._sendAction(actions.toggleTitle);
 	}
+
 	setContentHTML(html) {
 		this._sendAction(actions.setContentHtml, html);
 	}

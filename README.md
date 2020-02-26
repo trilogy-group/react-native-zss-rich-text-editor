@@ -69,21 +69,38 @@ The editor component. Simply place this component in your view hierarchy to rece
 * `initialTitleHTML`
 
 	HTML that will be rendered in the title section as soon as the component loads.
+
+* `hiddenTitle`
+
+	Boolean indicater whether to hide the title section.
+
 * `initialContentHTML`
 
 	HTML that will be rendered in the content section on load.
+
 * `titlePlaceholder`
 
 	Text that will be used as a placeholder when no text is present in the title section.
+
 * `contentPlaceholder `
 	
 	Text that will be used as a placeholder when no text is present in the content section.
+
+* `enableOnChange `
+
+	Boolean indicating whether to listen for content changes. Use in combination with `registerContentChangeListener` (see below).
+
 * `customCSS `
 
 	Any custom CSS styles that you want to inject to the editor.
+
 * `editorInitializedCallback `
 
 	A function that will be called when the editor has been initialized.
+
+* `autoFocusLinkModal `
+
+	Sets the `autoFocus` prop on the `Title` TextInput on the Link Modal.
 
 
 `RichTextEditor` also has methods that can be used on its `ref` to  set styling at the current selection or cursor position:
@@ -169,6 +186,34 @@ This method registers a function that will get called whenver the cursor positio
 ```
 
 ![RichTextEditor](readme/editor.png)
+
+To listen for content changes, use `registerContentChangeListener` to register a listener function. For example:
+
+```javascript
+	state = {
+		content: 'Hello <b>World</b> <p>this is a new paragraph</p> <p>this is another new paragraph</p>',
+	};
+
+	componentDidMount() {
+		this.richtext.registerContentChangeListener(this.onContentChange);
+	}
+
+	onContentChange(content) {
+		this.setState({
+			content: content,
+		});
+	}
+
+	render() {
+		return (
+			<RichTextEditor
+				ref={(r) => this.richtext = r}
+				initialContentHTML={this.state.content}
+				enableOnChange={true}
+			/>
+		);
+	}
+```
 
 ## `RichTextToolbar`
 
