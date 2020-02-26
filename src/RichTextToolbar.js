@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import React, { Component } from 'react';
 import {
 	FlatList,
 	View,
@@ -7,6 +7,7 @@ import {
 	Image,
 	StyleSheet,
 } from 'react-native';
+
 import { actions } from './const';
 
 const defaultActions = [
