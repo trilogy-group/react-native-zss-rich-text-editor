@@ -373,6 +373,7 @@ export default class RichTextEditor extends Component {
 					}}
 					onMessage={message => this.onMessage(message)}
 					source={pageSource}
+					originWhitelist={['*']}
 					onLoad={() => this.init()}
 				/>
 				{this._renderLinkModal()}
