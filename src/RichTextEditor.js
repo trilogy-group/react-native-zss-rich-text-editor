@@ -394,8 +394,9 @@ export default class RichTextEditor extends Component {
 	};
 
 	_sendAction(action, data) {
-		let jsToBeExecutedOnPage = MessageConverter({ type: action, data });
-		this.webview.injectJavaScript(jsToBeExecutedOnPage + ';true;');
+		const escapedData = typeof data === 'string' ? this.escapeJSONString(data) : data;
+		const jsToBeExecutedOnPage = MessageConverter({ type: action, data: escapedData });
+		this.webview.injectJavaScript(`${jsToBeExecutedOnPage};true;`);
 	}
 
 	//-------------------------------------------------------------------------------
