@@ -168,7 +168,11 @@ To focus or blur sections, use these methods
 To know when the title or content are in focus, use the following methods.
 
 *  `setTitleFocusHandler(callbackHandler) `
+*  `setTitleBlurHandler(callbackHandler) `
 *  `setContentFocusHandler(callbackHandler) `
+*  `setContentBlurHandler(callbackHandler) `
+*  `isTitleFocused() `
+*  `isContentFocused() `
 
 This method registers a function that will get called whenver the cursor position changes or a change is made to the styling of the editor at the cursor's position., The callback will be called with an array of `actions` that are active at the cusor position, allowing a toolbar to respond to changes.
 
@@ -319,7 +323,9 @@ This is a set of consts of all supported actions. These will be passed in arrays
 	  	setTitlePlaceholder: 'SET_TITLE_PLACEHOLDER',
 	  	setContentPlaceholder: 'SET_CONTENT_PLACEHOLDER',
 	  	setTitleFocusHandler: 'SET_TITLE_FOCUS_HANDLER',
+		setTitleBlurHandler: 'SET_TITLE_BLUR_HANDLER',
 	  	setContentFocusHandler: 'SET_CONTENT_FOCUS_HANDLER',
+		setContentBlurHandler: 'SET_CONTENT_BLUR_HANDLER',
 	  	prepareInsert: 'PREPARE_INSERT',
 	  	restoreSelection: 'RESTORE_SELECTION',
 	  	setCustomCSS: 'SET_CUSTOM_CSS',
