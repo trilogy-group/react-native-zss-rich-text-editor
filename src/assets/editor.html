@@ -1630,15 +1630,32 @@
 				editor.focus(callbackHandler);
 			}
 
+			function addBlurEvent(editorId, callbackHandler) {
+				var editor = $('#' + editorId);
+				editor.blur(callbackHandler);
+			}
+
 			zss_editor.setTitleFocusHandler = function() {
 				addFocusEvent('zss_editor_title', function() {
 					ReactNativeWebView.postMessage(JSON.stringify({type: 'TITLE_FOCUSED'}))
 				});
 			}
 
+			zss_editor.setTitleBlurHandler = function() {
+				addBlurEvent('zss_editor_title', function() {
+					ReactNativeWebView.postMessage(JSON.stringify({type: 'TITLE_BLURRED'}))
+				});
+			}
+
 			zss_editor.setContentFocusHandler = function() {
 				addFocusEvent('zss_editor_content', function() {
 					ReactNativeWebView.postMessage(JSON.stringify({type: 'CONTENT_FOCUSED'}))
+				});
+			}
+
+			zss_editor.setContentBlurHandler = function() {
+				addBlurEvent('zss_editor_content', function() {
+					ReactNativeWebView.postMessage(JSON.stringify({type: 'CONTENT_BLURRED'}))
 				});
 			}
 
