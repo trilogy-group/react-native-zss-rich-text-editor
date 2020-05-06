@@ -54,6 +54,8 @@ export default class RichTextEditor extends Component {
 			linkTitle: '',
 			linkUrl: '',
 			keyboardHeight: 0,
+			isTitleFocused: false,
+			isContentFocused: false,
 		};
 		this._selectedTextChangeListeners = [];
 	}
@@ -198,10 +200,16 @@ export default class RichTextEditor extends Component {
 					});
 					break;
 				case messages.TITLE_FOCUSED:
-					this.titleFocusHandler && this.titleFocusHandler();
+					this._titleFocusHandler();
+					break;
+				case messages.TITLE_BLURRED:
+					this._titleBlurHandler();
 					break;
 				case messages.CONTENT_FOCUSED:
-					this.contentFocusHandler && this.contentFocusHandler();
+					this._contentFocusHandler();
+					break;
+				case messages.CONTENT_BLURRED:
+					this._contentBlurHandler();
 					break;
 				case messages.SELECTION_CHANGE: {
 					const items = message.data.items;
@@ -412,6 +420,16 @@ export default class RichTextEditor extends Component {
 		});
 	}
 
+	isTitleFocused() {
+		const { isTitleFocused } = this.state;
+		return isTitleFocused;
+	}
+
+	isContentFocused() {
+		const { isContentFocused } = this.state;
+		return isContentFocused;
+	}
+
 	focusTitle() {
 		this._sendAction(actions.focusTitle);
 	}
@@ -601,6 +619,10 @@ export default class RichTextEditor extends Component {
 	}
 
 	init() {
+		this._sendAction(actions.setTitleFocusHandler);
+		this._sendAction(actions.setTitleBlurHandler);
+		this._sendAction(actions.setContentFocusHandler);
+		this._sendAction(actions.setContentBlurHandler);
 		this._sendAction(actions.init);
 		this.setPlatform();
 		if (this.props.footerHeight) {
@@ -676,14 +698,52 @@ export default class RichTextEditor extends Component {
 		});
 	}
 
+	_titleFocusHandler() {
+		this.setState({
+			isTitleFocused: true,
+		}, () => {
+			this.titleFocusHandler && this.titleFocusHandler();
+		});
+	};
+
+	_titleBlurHandler() {
+		this.setState({
+			isTitleFocused: false,
+		}, () => {
+			this.titleBlurHandler && this.titleBlurHandler();
+		});
+	}
+
+	_contentFocusHandler() {
+		this.setState({
+			isContentFocused: true,
+		}, () => {
+			this.contentFocusHandler && this.contentFocusHandler();
+		});
+	}
+
+	_contentBlurHandler() {
+		this.setState({
+			isContentFocused: false,
+		}, () => {
+			this.contentBlurHandler && this.contentBlurHandler();
+		});
+	}
+
 	setTitleFocusHandler(callbackHandler) {
 		this.titleFocusHandler = callbackHandler;
-		this._sendAction(actions.setTitleFocusHandler);
+	}
+
+	setTitleBlurHandler(callbackHandler) {
+		this.titleBlurHandler = callbackHandler;
 	}
 
 	setContentFocusHandler(callbackHandler) {
 		this.contentFocusHandler = callbackHandler;
-		this._sendAction(actions.setContentFocusHandler);
+	}
+
+	setContentBlurHandler(callbackHandler) {
+		this.contentBlurHandler = callbackHandler;
 	}
 
 	addSelectedTextChangeListener(listener) {

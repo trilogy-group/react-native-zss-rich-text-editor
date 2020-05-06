@@ -45,9 +45,19 @@ export default class RichTextExample extends Component {
 	setFocusHandlers() {
 		this.richtext.setTitleFocusHandler(() => {
 			//alert('title focus');
+			//console.log(`isTitleFocused: ${this.richtext.isTitleFocused()}`);
+		});
+		this.richtext.setTitleBlurHandler(() => {
+			//alert('title blur');
+			//console.log(`isTitleFocused: ${this.richtext.isTitleFocused()}`);
 		});
 		this.richtext.setContentFocusHandler(() => {
 			//alert('content focus');
+			//console.log(`isContentFocused: ${this.richtext.isContentFocused()}`);
+		});
+		this.richtext.setContentBlurHandler(() => {
+			//alert('content blur');
+			//console.log(`isContentFocused: ${this.richtext.isContentFocused()}`);
 		});
 	}
 }
