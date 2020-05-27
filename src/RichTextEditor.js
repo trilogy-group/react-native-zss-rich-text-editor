@@ -431,6 +431,10 @@ export default class RichTextEditor extends Component {
 	}
 
 	focusTitle() {
+		if (this.props.hiddenTitle) {
+			return;
+		}
+
 		this._sendAction(actions.focusTitle);
 	}
 
