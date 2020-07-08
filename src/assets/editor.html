@@ -4,6 +4,91 @@
 		<title>ZSSRichTextEditor</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 		<meta name="format-detection" content="telephone=no">
+		<style type="text/css">
+			/* Default ZSSRichTextEditor Styling */
+			* {
+				outline: 0px solid transparent;
+				-webkit-tap-highlight-color: rgba(0,0,0,0);
+				-webkit-touch-callout: none;
+			}
+
+			html, body {
+				padding: 0;
+				margin: 0;
+				font-family: Arial, Helvetica, sans-serif;
+				font-size:1em;
+				color:#2d4150;
+			}
+
+			body {
+				overflow-y: scroll;
+				-webkit-overflow-scrolling: touch;
+				height: 100%;
+			}
+
+			img {
+				max-width: 98%;
+				margin-left: auto;
+				margin-right: auto;
+				display: block;
+			}
+
+			audio {
+				padding: 20px 0;
+			}
+
+			div.zss_editor_content {
+				font-family: Arial, Helvetica, sans-serif;
+				color: #000;
+				width: 100%;
+				height: 100%;
+				-webkit-overflow-scrolling: touch;
+				overflow: auto;
+
+			}
+
+			div.zss_editor_title {
+				font-family: 'Helvetica Neue Light', sans-serif;
+				font-size: 23px;
+				line-height: 31px;
+				color: #2d4150;
+			}
+
+			[placeholder]:empty:before {
+				content: attr(placeholder);
+				color: #e0e0e0;
+			}
+
+			[placeholder]:empty:focus:before {
+				content: attr(placeholder);
+				color: #e0e0e0;
+			}
+
+			hr {
+				border: none;
+				height: 1px;
+				background-color: #e7e7e7;
+			}
+
+			#separatorContainer {
+				-webkit-user-select: none;
+				padding-left: 10px;
+				padding-right: 10px;
+			}
+		</style>
+
+		<style type="text/css">
+			/* Custom CSS Styling */
+			/*customcss*/
+		</style>
+	</head>
+
+	<body>
+		<!-- ZSSRichTextEditor Editable Content -->
+		<div id="zss_editor_title" class="zss_editor_title" contenteditable="true" placeholder="" disableLineBreaks="true"></div>
+		<div id="separatorContainer"><hr></div>
+		<div id="zss_editor_content" class="zss_editor_content" contenteditable="true" placeholder=""></div>
+		<div id="zss_editor_footer"></div>
 
 		<script type="text/javascript">
 			/*! jQuery v3.1.0 | (c) jQuery Foundation | jquery.org/license */
@@ -1672,91 +1757,5 @@
 
 			//end
 		</script>
-
-		<style type="text/css">
-			/* Default ZSSRichTextEditor Styling */
-			* {
-				outline: 0px solid transparent;
-				-webkit-tap-highlight-color: rgba(0,0,0,0);
-				-webkit-touch-callout: none;
-			}
-
-			html, body {
-				padding: 0;
-				margin: 0;
-				font-family: Arial, Helvetica, sans-serif;
-				font-size:1em;
-				color:#2d4150;
-			}
-
-			body {
-				overflow-y: scroll;
-				-webkit-overflow-scrolling: touch;
-				height: 100%;
-			}
-
-			img {
-				max-width: 98%;
-				margin-left: auto;
-				margin-right: auto;
-				display: block;
-			}
-
-			audio {
-				padding: 20px 0;
-			}
-
-			div.zss_editor_content {
-				font-family: Arial, Helvetica, sans-serif;
-				color: #000;
-				width: 100%;
-				height: 100%;
-				-webkit-overflow-scrolling: touch;
-				overflow: auto;
-
-			}
-
-			div.zss_editor_title {
-				font-family: 'Helvetica Neue Light', sans-serif;
-				font-size: 23px;
-				line-height: 31px;
-				color: #2d4150;
-			}
-
-			[placeholder]:empty:before {
-				content: attr(placeholder);
-				color: #e0e0e0;
-			}
-
-			[placeholder]:empty:focus:before {
-				content: attr(placeholder);
-				color: #e0e0e0;
-			}
-
-			hr {
-				border: none;
-				height: 1px;
-				background-color: #e7e7e7;
-			}
-
-			#separatorContainer {
-				-webkit-user-select: none;
-				padding-left: 10px;
-				padding-right: 10px;
-			}
-		</style>
-
-		<style type="text/css">
-			/* Custom CSS Styling */
-			/*customcss*/
-		</style>
-	</head>
-
-	<body>
-		<!-- ZSSRichTextEditor Editable Content -->
-		<div id="zss_editor_title" class="zss_editor_title" contenteditable="true" placeholder="" disableLineBreaks="true"></div>
-		<div id="separatorContainer"><hr></div>
-		<div id="zss_editor_content" class="zss_editor_content" contenteditable="true" placeholder=""></div>
-		<div id="zss_editor_footer"></div>
 	</body>
 </html>
