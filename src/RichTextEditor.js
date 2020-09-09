@@ -403,8 +403,12 @@ export default class RichTextEditor extends Component {
 	};
 
 	_sendAction(action, data) {
-		const escapedData = typeof data === 'string' ? this.escapeJSONString(data) : data;
-		const jsToBeExecutedOnPage = MessageConverter({ type: action, data: escapedData });
+		const escapedData =
+			typeof data === 'string' ? this.escapeJSONString(data) : data;
+		const jsToBeExecutedOnPage = MessageConverter({
+			type: action,
+			data: escapedData,
+		});
 		this.webview.injectJavaScript(`${jsToBeExecutedOnPage};true;`);
 	}
 
@@ -703,35 +707,47 @@ export default class RichTextEditor extends Component {
 	}
 
 	_titleFocusHandler() {
-		this.setState({
-			isTitleFocused: true,
-		}, () => {
-			this.titleFocusHandler && this.titleFocusHandler();
-		});
-	};
+		this.setState(
+			{
+				isTitleFocused: true,
+			},
+			() => {
+				this.titleFocusHandler && this.titleFocusHandler();
+			},
+		);
+	}
 
 	_titleBlurHandler() {
-		this.setState({
-			isTitleFocused: false,
-		}, () => {
-			this.titleBlurHandler && this.titleBlurHandler();
-		});
+		this.setState(
+			{
+				isTitleFocused: false,
+			},
+			() => {
+				this.titleBlurHandler && this.titleBlurHandler();
+			},
+		);
 	}
 
 	_contentFocusHandler() {
-		this.setState({
-			isContentFocused: true,
-		}, () => {
-			this.contentFocusHandler && this.contentFocusHandler();
-		});
+		this.setState(
+			{
+				isContentFocused: true,
+			},
+			() => {
+				this.contentFocusHandler && this.contentFocusHandler();
+			},
+		);
 	}
 
 	_contentBlurHandler() {
-		this.setState({
-			isContentFocused: false,
-		}, () => {
-			this.contentBlurHandler && this.contentBlurHandler();
-		});
+		this.setState(
+			{
+				isContentFocused: false,
+			},
+			() => {
+				this.contentBlurHandler && this.contentBlurHandler();
+			},
+		);
 	}
 
 	setTitleFocusHandler(callbackHandler) {
