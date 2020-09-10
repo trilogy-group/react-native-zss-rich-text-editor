@@ -118,6 +118,12 @@ export const MessageConverter = action => {
       ReactNativeWebView.postMessage(JSON.stringify({type: '${messages.CONTENT_HTML_RESPONSE}', data: html}));`;
 		case `${actions.getSelectedText}`:
 			return `var selectedText = getSelection().toString();
-      ReactNativeWebView.postMessage(JSON.stringify({type: '${messages.SELECTED_TEXT_RESPONSE}', data: selectedText}));`;
+	  	ReactNativeWebView.postMessage(JSON.stringify({type: '${messages.SELECTED_TEXT_RESPONSE}', data: selectedText}));`;
+		case `${actions.insertHTML}`:
+			return `zss_editor.insertHTML('${action.data}');`;
+		case `${actions.insertCSS}`:
+			return `zss_editor.insertCSS('${action.data}');`;
+		case `${actions.insertExternalCSS}`:
+			return `zss_editor.insertExternalCSS('${action.data}');`;
 	}
 };

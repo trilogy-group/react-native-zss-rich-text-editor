@@ -769,6 +769,18 @@ export default class RichTextEditor extends Component {
 	addSelectedTextChangeListener(listener) {
 		this._selectedTextChangeListeners.push(listener);
 	}
+
+	insertHTML(html) {
+		this._sendAction(actions.insertHTML, html);
+	}
+
+	insertCSS(css) {
+		this._sendAction(actions.insertCSS, css);
+	}
+
+	insertExternalCSS(uri) {
+		this._sendAction(actions.insertExternalCSS, uri);
+	}
 }
 
 const styles = StyleSheet.create({

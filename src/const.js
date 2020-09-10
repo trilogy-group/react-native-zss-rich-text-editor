@@ -13,6 +13,9 @@ export const actions = {
 	blurContentEditor: 'BLUR_CONTENT_EDITOR',
 	focusTitle: 'FOCUS_TITLE',
 	focusContent: 'FOCUS_CONTENT',
+	insertHTML: 'INSERT_HTML',
+	insertCSS: 'INSERT_CSS',
+	insertExternalCSS: 'INSERT_EXTERNAL_CSS',
 
 	setBold: 'bold',
 	setItalic: 'italic',

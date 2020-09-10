@@ -1895,15 +1895,12 @@
 										i > 1 && ua(m),
 										i > 1 &&
 											sa(
-												a
-													.slice(0, i - 1)
-													.concat({
-														value:
-															' ' ===
-															a[i - 2].type
-																? '*'
-																: '',
-													}),
+												a.slice(0, i - 1).concat({
+													value:
+														' ' === a[i - 2].type
+															? '*'
+															: '',
+												}),
 											).replace(P, '$1'),
 										c,
 										i < e && ya(a.slice(i, e)),
@@ -8011,6 +8008,17 @@
 				}
 			}
 
+			function postMessage(message) {
+				if (
+					typeof ReactNativeWebView !== 'undefined' &&
+					ReactNativeWebView.postMessage
+				) {
+					ReactNativeWebView.postMessage(message);
+				}
+
+				console.log('ReactNativeWebView.postMessage', message);
+			}
+
 			function setCurrentEditingLinkOnTouch() {
 				$('#zss_editor_content').delegate('a', 'touchend', function(
 					event,
@@ -8023,7 +8031,7 @@
 						title: anchor.text(),
 						url: anchor.attr('href'),
 					};
-					ReactNativeWebView.postMessage(
+					postMessage(
 						JSON.stringify({ type: 'LINK_TOUCHED', data: link }),
 					);
 				});
@@ -8102,9 +8110,7 @@
 				whenPastingInsertAsPlainText('zss_editor_content');
 
 				setTimeout(function() {
-					ReactNativeWebView.postMessage(
-						JSON.stringify({ type: 'ZSS_INITIALIZED' }),
-					);
+					postMessage(JSON.stringify({ type: 'ZSS_INITIALIZED' }));
 				}, 20);
 			}; //end
 
@@ -8118,7 +8124,7 @@
 					selectedTextChangeMessage !==
 					zss_editor.previousSelectedTextChangeMessage
 				) {
-					ReactNativeWebView.postMessage(selectedTextChangeMessage);
+					postMessage(selectedTextChangeMessage);
 					zss_editor.previousSelectedTextChangeMessage = selectedTextChangeMessage;
 				}
 			}
@@ -8172,16 +8178,14 @@
 
 			// This will show up in the XCode console as we are able to push this into an NSLog.
 			zss_editor.debug = function(msg) {
-				ReactNativeWebView.postMessage(
-					JSON.stringify({ type: 'LOG', data: msg }),
-				);
+				postMessage(JSON.stringify({ type: 'LOG', data: msg }));
 			};
 
 			zss_editor.setScrollPosition = function() {
 				if (zss_editor.isUsingiOS) {
 					// add by xukj - fix error on android
 					var position = window.pageYOffset;
-					ReactNativeWebView.postMessage(
+					postMessage(
 						JSON.stringify({ type: 'SCROLL', data: position }),
 					);
 				}
@@ -8461,7 +8465,30 @@
 				zss_editor.enabledEditingItems();
 			};
 
-			// Needs addClass method
+			zss_editor.insertCSS = function(css) {
+				const stylesheet = document.createElement('style');
+				stylesheet.type = 'text/css';
+				const innerHTML = decodeURIComponent(
+					`${encodeURIComponent(css)}`,
+				);
+				stylesheet.innerHTML = innerHTML;
+				stylesheet.onerror = () => {
+					zss_editor.log(`insertCSS: ${css} stylesheet failed`);
+				};
+				document.head.append(stylesheet);
+				zss_editor.log(`insertCSS: ${css}`);
+			};
+
+			zss_editor.insertExternalCSS = function(uri) {
+				const link = document.createElement('link');
+				link.setAttribute('rel', 'stylesheet');
+				link.setAttribute('href', uri);
+				link.onerror = () => {
+					zss_editor.log(`insertExternalCSS: ${uri} link failed`);
+				};
+				document.head.append(link);
+				zss_editor.log(`insertExternalCSS: ${uri}`);
+			};
 
 			zss_editor.insertLink = function(url, title) {
 				zss_editor.restorerange();
@@ -8603,7 +8630,7 @@
 
 			zss_editor.enableOnChange = function() {
 				$('#zss_editor_content').on('input', function() {
-					ReactNativeWebView.postMessage(
+					postMessage(
 						JSON.stringify({
 							type: 'CONTENT_CHANGE',
 							data: { content: getHtml('zss_editor_content') },
@@ -8805,7 +8832,7 @@
 					selectionChangeMessage !==
 					zss_editor.previousSelectionChangeMessage
 				) {
-					ReactNativeWebView.postMessage(selectionChangeMessage);
+					postMessage(selectionChangeMessage);
 					zss_editor.previousSelectionChangeMessage = selectionChangeMessage;
 				}
 			}
@@ -8863,33 +8890,25 @@
 
 			zss_editor.setTitleFocusHandler = function() {
 				addFocusEvent('zss_editor_title', function() {
-					ReactNativeWebView.postMessage(
-						JSON.stringify({ type: 'TITLE_FOCUSED' }),
-					);
+					postMessage(JSON.stringify({ type: 'TITLE_FOCUSED' }));
 				});
 			};
 
 			zss_editor.setTitleBlurHandler = function() {
 				addBlurEvent('zss_editor_title', function() {
-					ReactNativeWebView.postMessage(
-						JSON.stringify({ type: 'TITLE_BLURRED' }),
-					);
+					postMessage(JSON.stringify({ type: 'TITLE_BLURRED' }));
 				});
 			};
 
 			zss_editor.setContentFocusHandler = function() {
 				addFocusEvent('zss_editor_content', function() {
-					ReactNativeWebView.postMessage(
-						JSON.stringify({ type: 'CONTENT_FOCUSED' }),
-					);
+					postMessage(JSON.stringify({ type: 'CONTENT_FOCUSED' }));
 				});
 			};
 
 			zss_editor.setContentBlurHandler = function() {
 				addBlurEvent('zss_editor_content', function() {
-					ReactNativeWebView.postMessage(
-						JSON.stringify({ type: 'CONTENT_BLURRED' }),
-					);
+					postMessage(JSON.stringify({ type: 'CONTENT_BLURRED' }));
 				});
 			};
 
@@ -8903,9 +8922,7 @@
 
 			// add by xukj - log
 			zss_editor.log = function(message) {
-				ReactNativeWebView.postMessage(
-					JSON.stringify({ type: 'LOG', data: message }),
-				);
+				postMessage(JSON.stringify({ type: 'LOG', data: message }));
 			};
 
 			//end
