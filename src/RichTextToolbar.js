@@ -11,6 +11,7 @@ import {
 import { actions } from './const';
 
 const defaultActions = [
+	actions.startMention,
 	actions.insertImage,
 	actions.setBold,
 	actions.setItalic,
@@ -21,6 +22,7 @@ const defaultActions = [
 
 function getDefaultIcon() {
 	const texts = {};
+	texts[actions.startMention] = require('../img/icon_mention.png');
 	texts[actions.insertImage] = require('../img/icon_format_media.png');
 	texts[actions.setBold] = require('../img/icon_format_bold.png');
 	texts[actions.setItalic] = require('../img/icon_format_italic.png');
@@ -188,6 +190,7 @@ export default class RichTextToolbar extends Component {
 			case actions.setHR:
 			case actions.setIndent:
 			case actions.setOutdent:
+			case actions.startMention:
 				this.state.editor._sendAction(action);
 				break;
 			case actions.insertLink:

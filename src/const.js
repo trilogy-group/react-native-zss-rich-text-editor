@@ -16,6 +16,8 @@ export const actions = {
 	insertHTML: 'INSERT_HTML',
 	insertCSS: 'INSERT_CSS',
 	insertExternalCSS: 'INSERT_EXTERNAL_CSS',
+	insertMention: 'INSERT_MENTION',
+	startMention: 'START_MENTION',
 
 	setBold: 'bold',
 	setItalic: 'italic',
@@ -76,4 +78,7 @@ export const messages = {
 	SELECTED_TEXT_RESPONSE: 'SELECTED_TEXT_RESPONSE',
 	LINK_TOUCHED: 'LINK_TOUCHED',
 	SELECTED_TEXT_CHANGED: 'SELECTED_TEXT_CHANGED',
+	ENTER_MENTION: 'ENTER_MENTION',
+	EXIT_MENTION: 'EXIT_MENTION',
+	MENTION_TEXT_CHANGED: 'MENTION_TEXT_CHANGED',
 };

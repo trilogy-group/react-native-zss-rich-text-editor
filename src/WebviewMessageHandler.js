@@ -57,9 +57,9 @@ export const MessageConverter = action => {
 		case `${actions.insertOrderedList}`:
 			return `zss_editor.setOrderedList();`;
 		case `${actions.insertLink}`:
-			return `zss_editor.insertLink('${action.data.url}', '${action.data.title}');`;
+			return `zss_editor.insertLink('${action.data.url}', '${action.data.title}', '${action.data.className}');`;
 		case `${actions.updateLink}`:
-			return `zss_editor.updateLink('${action.data.url}', '${action.data.title}');`;
+			return `zss_editor.updateLink('${action.data.url}', '${action.data.title}', '${action.data.className}');`;
 		case `${actions.insertImage}`:
 			const image = JSON.stringify(action.data);
 			return `zss_editor.insertImage(${image});`;
@@ -125,5 +125,9 @@ export const MessageConverter = action => {
 			return `zss_editor.insertCSS('${action.data}');`;
 		case `${actions.insertExternalCSS}`:
 			return `zss_editor.insertExternalCSS('${action.data}');`;
+		case `${actions.startMention}`:
+			return `zss_editor.insertAtAndStartMention();`;
+		case `${actions.insertMention}`:
+			return `zss_editor.insertMention('${action.data.url}', '${action.data.title}', '${action.data.className}');`;
 	}
 };

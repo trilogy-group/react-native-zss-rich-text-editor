@@ -7937,6 +7937,8 @@
 				return multi_parser.output.join('');
 			}
 
+			const isMobileDevice = /Mobi/i.test(window.navigator.userAgent);
+
 			/*!
 			 *
 			 * ZSSRichTextEditor v0.5.2
@@ -7976,6 +7978,475 @@
 			 * The initializer function that must be called onLoad
 			 */
 
+			$(document).on('keyup', function(event) {
+				// Some devices send an additional event for the shift key; ignore it
+				if (
+					!event.shiftKey ||
+					(!isMobileDevice && event.key !== 'Shift')
+				) {
+					checkMention();
+				}
+			});
+			$(document).on(
+				'keyup',
+				handleKeyupEventToPutTypedKeyInInternalMentionSpan,
+			);
+			$(document).on(
+				'keyup',
+				handleKeyupEventToCheckIfBackspacedAndDeletedMention,
+			);
+			$(document).on('keyup', handleKeyupEventToNotifyMentionTextChanged);
+			$(window).on(
+				'touchmove',
+				handleTouchEventToChangeMentionStateIfNeeded,
+			);
+			$(window).on(
+				'touchstart',
+				handleTouchEventToChangeMentionStateIfNeeded,
+			);
+			$(window).on(
+				'touchend',
+				handleTouchEventToChangeMentionStateIfNeeded,
+			);
+
+			function handleKeyupEventToNotifyMentionTextChanged() {
+				/* zss_editor.log('handleKeyupEventToNotifyMentionTextChanged()'); */
+				var internalMentionSpan = document.getElementById(
+					mentionInternalSpanId,
+				);
+				if (mentionState.on && internalMentionSpan) {
+					fireEventMentionTextChanged(
+						internalMentionSpan.textContent,
+					);
+				} else if (mentionState.on && !internalMentionSpan) {
+					// When backspacing and leaving only the @ sign, the internal span is deleted. this is why we check
+					fireEventMentionTextChanged('');
+				}
+			}
+
+			function handleKeyupEventToCheckIfBackspacedAndDeletedMention(
+				event,
+			) {
+				/* zss_editor.log(
+					'handleKeyupEventToCheckIfBackspacedAndDeletedMention()',
+				); */
+				var externalSpan = document.getElementById(
+					mentionExternalSpanId,
+				);
+				if (!externalSpan) {
+					fireEventDidExitMentionMode();
+				}
+
+				if (
+					event.keyCode == 8 &&
+					mentionState.on &&
+					externalSpan.textContent.length == 0
+				) {
+					fireEventDidExitMentionMode();
+				}
+			}
+
+			// Doesnt do anything if not in mention mode
+			// Returns the span. doenst add it if it exists
+			function addInternalMentionSpanToExternalSpan() {
+				var externalSpan = document.getElementById(
+					mentionExternalSpanId,
+				);
+				if (!mentionState.on || !externalSpan) {
+					return;
+				}
+
+				var internalSpan = document.getElementById(
+					mentionInternalSpanId,
+				);
+				if (internalSpan) {
+					return internalSpan;
+				}
+
+				var atMentionInternalSpan = document.createElement('span');
+				atMentionInternalSpan.id = mentionInternalSpanId;
+				externalSpan.appendChild(atMentionInternalSpan);
+				return atMentionInternalSpan;
+			}
+
+			function handleKeyupEventToPutTypedKeyInInternalMentionSpan(event) {
+				/* zss_editor.log(
+					'handleKeyupEventToPutTypedKeyInInternalMentionSpan()',
+				); */
+				var selection = window.getSelection();
+
+				//This adds the internal span if it was deleted with backspaces
+				if (mentionState.on && event.keyCode && event.keyCode != 8) {
+					addInternalMentionSpanToExternalSpan();
+				}
+
+				if (
+					selection.rangeCount > 0 &&
+					mentionState.on &&
+					event.keyCode != 8
+				) {
+					// Not backspace
+					var range = selection.getRangeAt(0);
+					var startContainerForTextRangeIsExternalAfterAtSign =
+						range.startContainer.parentNode.id ===
+							mentionExternalSpanId && range.startOffset == 2;
+
+					if (
+						startContainerForTextRangeIsExternalAfterAtSign &&
+						document.getElementById(mentionInternalSpanId)
+					) {
+						// Delete added key
+						var externalSpan = document.getElementById(
+							mentionExternalSpanId,
+						);
+						var lastChar = externalSpan.firstChild.data.charAt(1);
+						var atNode = document.createTextNode('@');
+						externalSpan.replaceChild(
+							atNode,
+							externalSpan.firstChild,
+						);
+
+						// Add key to internal span
+						var atMentionInternalSpan = document.getElementById(
+							mentionInternalSpanId,
+						);
+						var pressedKeyNode = document.createTextNode(lastChar);
+						var rangeToAddTo = document.createRange();
+						rangeToAddTo.setStart(atMentionInternalSpan, 0);
+						rangeToAddTo.collapse();
+						rangeToAddTo.insertNode(pressedKeyNode);
+
+						//Move cursor to correct place
+						var cursorRange = document.createRange();
+						cursorRange.setStart(pressedKeyNode, 1);
+						cursorRange.collapse();
+						setCaretAfter(cursorRange, pressedKeyNode);
+
+						// Make sure that we are in mention mode.
+						// Because there are issues with catching the mouse being moved to exctly after the @ sign, this is needed for edge cases
+						fireEventDidEnterMentionMode();
+					}
+
+					var startIndexIsInTheInternalSpan =
+						range.startContainer.parentNode.id ===
+						mentionInternalSpanId;
+					if (startIndexIsInTheInternalSpan) {
+						fireEventDidEnterMentionMode();
+					}
+				}
+			}
+
+			function checkMention() {
+				/* zss_editor.log('checkMention()'); */
+				if (isAfterAt()) {
+					startMention();
+				}
+			}
+
+			function isSelectionAvailable() {
+				var sel = window.getSelection();
+				return !!sel.rangeCount;
+			}
+
+			function getSelectedRange() {
+				var sel = window.getSelection();
+				if (sel.rangeCount === 0) {
+					return null;
+				}
+
+				return sel.getRangeAt(0);
+			}
+
+			function prepareForMention(activeRange) {
+				/* zss_editor.log('prepareForMention()'); */
+				activeRange.setStart(
+					activeRange.startContainer,
+					activeRange.startOffset - 1,
+				);
+			}
+
+			function setCaretAfter(range, pivot) {
+				// Set the caret to the end of the text.
+				range.selectNode(pivot);
+				range.collapse();
+				setSelectedRange(range);
+			}
+
+			function setSelectedRange(range) {
+				var selection = window.getSelection();
+				selection.removeAllRanges();
+				selection.addRange(range);
+			}
+
+			var mentionState = {
+				on: false,
+			};
+
+			var mentionExternalSpanId = 'mentionExternalSpan';
+			var mentionInternalSpanId = 'mentionInternalSpan';
+
+			function startMention(shouldAvoidCheckingValidity) {
+				/* zss_editor.log('startMention()'); */
+
+				if (mentionState.on === true) {
+					var externalMentionSpan = document.getElementById(
+						mentionExternalSpanId,
+					);
+					if (externalMentionSpan && isAfterAt()) {
+						fireEventMentionTextChanged('');
+						return;
+					}
+
+					fireEventDidExitMentionMode();
+				}
+
+				if (!isValidAt() && !shouldAvoidCheckingValidity) {
+					return;
+				}
+
+				// Delete the @ sign
+				deleteMentionSpanIfExists();
+
+				var range = window.getSelection().getRangeAt(0);
+				var clone = range.cloneRange();
+
+				clone.setStart(range.startContainer, range.startOffset - 1);
+				clone.setEnd(range.startContainer, range.startOffset);
+				clone.deleteContents();
+
+				// Create the mention span and add it
+				var atMentionSpan = document.createElement('span');
+				atMentionSpan.id = mentionExternalSpanId;
+				clone.insertNode(atMentionSpan);
+
+				// Add @ to the at mention span
+				var atNode = document.createTextNode('@');
+				atMentionSpan.appendChild(atNode);
+
+				// Create the internal mention span that doesn't have the @ sign
+				var atMentionInternalSpan = document.createElement('span');
+				atMentionInternalSpan.id = mentionInternalSpanId;
+				atMentionSpan.appendChild(atMentionInternalSpan);
+
+				// Move the cursor after the @ in the internal span
+				var newSelectionRange = document.createRange();
+				newSelectionRange.setStart(atMentionInternalSpan, 0);
+				setCaretAfter(newSelectionRange, atMentionInternalSpan);
+
+				// Change state
+				fireEventDidEnterMentionMode();
+
+				atMentionSpan.expando = atNode;
+			}
+
+			function fireEventDidEnterMentionMode() {
+				/* zss_editor.log('fireEventDidEnterMentionMode()'); */
+				if (mentionState.on == false) {
+					mentionState.on = true;
+
+					postMessage(
+						JSON.stringify({
+							type: 'ENTER_MENTION',
+							data: { started: true, text: '' },
+						}),
+					);
+				}
+			}
+
+			function deleteMentionSpanIfExists() {
+				/* zss_editor.log('deleteMentionSpanIfExists()'); */
+
+				var span = document.getElementById(mentionExternalSpanId);
+				if (span) {
+					span.parentNode.removeChild(span);
+				}
+
+				span = document.getElementById(mentionInternalSpanId);
+				if (span) {
+					span.parentNode.removeChild(span);
+				}
+			}
+
+			function fireEventDidExitMentionMode() {
+				/* zss_editor.log('fireEventDidExitMentionMode()'); */
+
+				if (mentionState.on === true) {
+					mentionState.on = false;
+					// clear any previous mention spans
+					if (document.getElementById(mentionExternalSpanId)) {
+						document.getElementById(mentionExternalSpanId).id = '';
+					}
+
+					if (document.getElementById(mentionInternalSpanId)) {
+						document.getElementById(mentionInternalSpanId).id = '';
+					}
+
+					postMessage(
+						JSON.stringify({
+							type: 'EXIT_MENTION',
+						}),
+					);
+				}
+			}
+
+			function fireEventMentionTextChanged(text) {
+				if (mentionState.on === true) {
+					postMessage(
+						JSON.stringify({
+							type: 'MENTION_TEXT_CHANGED',
+							data: { text: text.trim() },
+						}),
+					);
+				}
+			}
+
+			function handleTouchEventToChangeMentionStateIfNeeded(event) {
+				var target = event.target || event.srcElement;
+				var touchedElementId = target.id;
+
+				checkTouchLocationAfterTimeout();
+
+				// Check if we are in mention state and should get out
+				if (
+					!touchedElementId ||
+					(!touchedElementId.length && mentionState.on)
+				) {
+					fireEventDidExitMentionMode();
+					return;
+				}
+
+				// Check if we are not in mention mode and the touch moved to the internal span
+				if (
+					touchedElementId == mentionInternalSpanId &&
+					!mentionState.on
+				) {
+					fireEventDidEnterMentionMode();
+					return;
+				}
+
+				// Check if we are not in mention mode and the touch event moved to the external span after the @ sign
+				if (
+					touchedElementId == mentionExternalSpanId &&
+					!mentionState.on
+				) {
+					return;
+				}
+			}
+
+			// This is needed because the touch could be not where we want it and it takes the cursor some time to get to the place it should be
+			function checkTouchLocationAfterTimeout() {
+				setTimeout(function() {
+					var selection = window.getSelection();
+					if (selection.rangeCount > 0) {
+						var range = selection.getRangeAt(0);
+						if (
+							range.startOffset == 1 &&
+							range.collapsed &&
+							range.startContainer.parentNode.id ==
+								mentionExternalSpanId
+						) {
+							fireEventDidEnterMentionMode();
+							return;
+						}
+
+						if (
+							range.collapsed &&
+							range.startContainer.parentNode.id ==
+								mentionInternalSpanId
+						) {
+							fireEventDidEnterMentionMode();
+							return;
+						}
+					}
+				}, 400);
+			}
+
+			function isValidAt() {
+				/* zss_editor.log('isValidAt()'); */
+				var selection = window.getSelection();
+				if (!selection.rangeCount) {
+					return false;
+				}
+
+				var range = selection.getRangeAt(0);
+				var node = range.startContainer;
+				if (
+					!range.collapsed ||
+					node.nodeType !== 3 ||
+					(node.parentNode && node.parentNode.tagName === 'A')
+				) {
+					return false;
+				}
+
+				var text = range.startContainer.nodeValue;
+				// get the character before and after
+				var testText = text.slice(
+					range.startOffset - 2,
+					range.startOffset + 1,
+				);
+				// if it is either at the begining or end, or has a space before and after
+				return /(^|\W)@(\W|$)/.test(testText);
+			}
+
+			function isAfterAt() {
+				/* zss_editor.log('isAfterAt()'); */
+				var sel = window.getSelection();
+				var caret = sel.getRangeAt(0);
+				if (caret !== null && caret.collapsed) {
+					var range = caret.cloneRange();
+
+					range.setStart(range.startContainer, 0);
+
+					// TODO: @ -> to constants.
+					return range.toString().slice(-1) === '@';
+				}
+
+				return false;
+			}
+
+			function insertElementAtCursor(elm) {
+				var sel, range, html;
+				if (window.getSelection) {
+					sel = window.getSelection();
+					if (sel.getRangeAt && sel.rangeCount) {
+						range = sel.getRangeAt(0);
+						range.deleteContents();
+						range.insertNode(elm);
+
+						var textNode = document.createTextNode('\u00A0');
+						range.setStartAfter(elm);
+						range.insertNode(textNode);
+						range.setStartAfter(textNode);
+						range.collapse(true);
+						sel = window.getSelection();
+						sel.removeAllRanges();
+						sel.addRange(range);
+						textNode.parentElement.removeChild(textNode);
+					}
+				}
+			}
+
+			zss_editor.replaceMentionWithElement = function(element) {
+				if (!element) {
+					return;
+				}
+
+				/* zss_editor.log('replaceMentionWithElement()'); */
+				var externalMentionSpan = document.getElementById(
+					mentionExternalSpanId,
+				);
+				if (!externalMentionSpan) {
+					return;
+				}
+
+				var externalMentionSpanParent = externalMentionSpan.parentNode;
+				externalMentionSpanParent.removeChild(externalMentionSpan);
+				insertElementAtCursor(element);
+				insertElementAtCursor(document.createTextNode('\u00A0'));
+
+				fireEventDidExitMentionMode();
+			};
+
 			function setupTouchEndEnableEditing(editorId) {
 				$('#' + editorId).on('touchend', function(e) {
 					zss_editor.enabledEditingItems(e);
@@ -8011,36 +8482,46 @@
 			function postMessage(message) {
 				if (
 					typeof ReactNativeWebView !== 'undefined' &&
-					ReactNativeWebView.postMessage
+					!!ReactNativeWebView.postMessage
 				) {
 					ReactNativeWebView.postMessage(message);
+					return;
 				}
 
 				console.log('ReactNativeWebView.postMessage', message);
 			}
 
 			function setCurrentEditingLinkOnTouch() {
-				$('#zss_editor_content').delegate('a', 'touchend', function(
-					event,
-				) {
-					var anchor = $(event.currentTarget);
+				$('#zss_editor_content').on(
+					'touchend click',
+					'a',
+					null,
+					function(event) {
+						var anchor = $(event.target);
 
-					zss_editor.currentEditingLink = anchor;
+						zss_editor.currentEditingLink = anchor;
+						zss_editor.log(`anchor: ${JSON.stringify(anchor)}`);
 
-					var link = {
-						title: anchor.text(),
-						url: anchor.attr('href'),
-					};
-					postMessage(
-						JSON.stringify({ type: 'LINK_TOUCHED', data: link }),
-					);
-				});
+						var link = {
+							title: anchor.text(),
+							url: anchor.attr('href'),
+							className: anchor.attr('class'),
+						};
+						postMessage(
+							JSON.stringify({
+								type: 'LINK_TOUCHED',
+								data: link,
+							}),
+						);
+					},
+				);
 			}
 
 			function preventLinkFollowingOnTouch() {
-				$('#zss_editor_content').delegate(
-					'a',
+				$('#zss_editor_content').on(
 					'click touchend',
+					'a',
+					null,
 					function(event) {
 						event.preventDefault();
 					},
@@ -8254,6 +8735,10 @@
 
 			zss_editor.backuprange = function() {
 				var selection = window.getSelection();
+				if (!selection) {
+					return;
+				}
+
 				var range = selection.getRangeAt(0);
 				zss_editor.currentSelection = {
 					startContainer: range.startContainer,
@@ -8284,6 +8769,7 @@
 					selection = getSelection();
 					node = selection.anchorNode;
 				}
+
 				if (!node && document.selection) {
 					selection = document.selection;
 					var range = selection.getRangeAt
@@ -8295,6 +8781,7 @@
 						? range.parentElement()
 						: range.item(0);
 				}
+
 				if (node) {
 					return node.nodeName == '#text' ? node.parentNode : node;
 				}
@@ -8466,6 +8953,7 @@
 			};
 
 			zss_editor.insertCSS = function(css) {
+				/* zss_editor.log(`insertCSS: ${css}`); */
 				const stylesheet = document.createElement('style');
 				stylesheet.type = 'text/css';
 				const innerHTML = decodeURIComponent(
@@ -8476,10 +8964,10 @@
 					zss_editor.log(`insertCSS: ${css} stylesheet failed`);
 				};
 				document.head.append(stylesheet);
-				zss_editor.log(`insertCSS: ${css}`);
 			};
 
 			zss_editor.insertExternalCSS = function(uri) {
+				/* zss_editor.log(`insertExternalCSS: ${uri}`); */
 				const link = document.createElement('link');
 				link.setAttribute('rel', 'stylesheet');
 				link.setAttribute('href', uri);
@@ -8487,17 +8975,19 @@
 					zss_editor.log(`insertExternalCSS: ${uri} link failed`);
 				};
 				document.head.append(link);
-				zss_editor.log(`insertExternalCSS: ${uri}`);
 			};
 
-			zss_editor.insertLink = function(url, title) {
+			zss_editor.insertLink = function(url, title, className) {
 				zss_editor.restorerange();
 				var sel = document.getSelection();
 				sel.deleteFromDocument();
 				document.execCommand(
 					'insertHTML',
 					false,
-					'<a href="' +
+					'<a class="' +
+						encodeHtmlEntities(className) +
+						'"' +
+						' href="' +
 						encodeHtmlEntities(url) +
 						'">' +
 						encodeHtmlEntities(title) +
@@ -8507,16 +8997,63 @@
 				zss_editor.enabledEditingItems();
 			};
 
-			zss_editor.updateLink = function(url, title) {
+			zss_editor.updateLink = function(url, title, className) {
 				zss_editor.restorerange();
 
 				if (zss_editor.currentEditingLink) {
 					var c = zss_editor.currentEditingLink;
 					c.attr('href', url);
+					c.attr('class', className);
 					c.text(title);
 				}
 				zss_editor.enabledEditingItems();
 			}; //end
+
+			zss_editor.insertMention = function(url, title, className) {
+				/* zss_editor.log(
+					`insertMention('${url}', '${title}', '${className}')`,
+				); */
+				var mentionLinkElement = document.createElement('a');
+				mentionLinkElement.className = className;
+				mentionLinkElement.setAttribute('href', url);
+				mentionLinkElement.textContent = title;
+				var space = document.createElement('span');
+				space.innerHTML = '\xa0';
+				zss_editor.replaceMentionWithElement(mentionLinkElement);
+			};
+
+			function removeNode(previous) {
+				var temp = previous.previousSibling;
+
+				previous.parentNode.removeChild(previous);
+
+				return temp;
+			}
+
+			function trimPrevious(previous, text) {
+				var nodeValue = previous.nodeValue,
+					nodeValueEndTextStartIndex,
+					nodeValueEndText;
+
+				if (nodeValue === text) {
+					previous.parentNode.removeChild(previous);
+				}
+
+				nodeValueEndTextStartIndex = nodeValue.length - text.length;
+				nodeValueEndText = nodeValue.slice(nodeValueEndTextStartIndex);
+				if (nodeValueEndText === text) {
+					previous.nodeValue = nodeValue.substring(
+						0,
+						nodeValueEndTextStartIndex,
+					);
+				}
+			}
+
+			zss_editor.insertAtAndStartMention = function() {
+				/* zss_editor.log(`insertAtAndStartMention()`); */
+				insertElementAtCursor(document.createTextNode('@'));
+				startMention(true);
+			};
 
 			zss_editor.updateImage = function(url, alt) {
 				zss_editor.restorerange();
@@ -8720,46 +9257,60 @@
 				if (zss_editor.isCommandEnabled('bold')) {
 					items.push('bold');
 				}
+
 				if (zss_editor.isCommandEnabled('italic')) {
 					items.push('italic');
 				}
+
 				if (zss_editor.isCommandEnabled('subscript')) {
 					items.push('subscript');
 				}
+
 				if (zss_editor.isCommandEnabled('superscript')) {
 					items.push('superscript');
 				}
+
 				if (zss_editor.isCommandEnabled('strikeThrough')) {
 					items.push('strikeThrough');
 				}
+
 				if (zss_editor.isCommandEnabled('underline')) {
 					items.push('underline');
 				}
+
 				if (zss_editor.isCommandEnabled('insertOrderedList')) {
 					items.push('orderedList');
 				}
+
 				if (zss_editor.isCommandEnabled('insertUnorderedList')) {
 					items.push('unorderedList');
 				}
+
 				if (zss_editor.isCommandEnabled('justifyCenter')) {
 					items.push('justifyCenter');
 				}
+
 				if (zss_editor.isCommandEnabled('justifyFull')) {
 					items.push('justifyFull');
 				}
+
 				if (zss_editor.isCommandEnabled('justifyLeft')) {
 					items.push('justifyLeft');
 				}
+
 				if (zss_editor.isCommandEnabled('justifyRight')) {
 					items.push('justifyRight');
 				}
+
 				if (zss_editor.isCommandEnabled('insertHorizontalRule')) {
 					items.push('horizontalRule');
 				}
+
 				var formatBlock = document.queryCommandValue('formatBlock');
 				if (formatBlock.length > 0) {
 					items.push(formatBlock);
 				}
+
 				// Images
 				$('img').bind('touchstart', function(e) {
 					$('img').removeClass('zs_active');
@@ -8794,7 +9345,7 @@
 						items.push('textColor');
 					}
 
-					//Fonts
+					// Fonts
 					var font = t.css('font-family');
 					if (
 						font.length != 0 &&
@@ -8868,14 +9419,6 @@
 
 			zss_editor.setCustomCSS = function(customCSS) {
 				document.getElementsByTagName('style')[1].innerHTML = customCSS;
-
-				//set focus
-				/*editor.focusout(function(){
-				 var element = $(this);
-				 if (!element.text().trim().length) {
-				 element.empty();
-				 }
-				 });*/
 			};
 
 			function addFocusEvent(editorId, callbackHandler) {

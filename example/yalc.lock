@@ -2,7 +2,7 @@
   "version": "v1",
   "packages": {
     "react-native-zss-rich-text-editor": {
-      "signature": "11fa5067976e79f35c79198b372b21b8",
+      "signature": "27ed553afcf28336e879d260ce78bddd",
       "file": true,
       "replaced": "file:../react-native-zss-rich-text-editor.tgz"
     }

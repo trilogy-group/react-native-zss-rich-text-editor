@@ -2,31 +2,11 @@
 
 > Visit [original repo](https://github.com/wix/react-native-zss-rich-text-editor) first
 
-This resolves [#171](https://github.com/wix/react-native-zss-rich-text-editor/issues/171), [#174](https://github.com/wix/react-native-zss-rich-text-editor/issues/174), and [#178](https://github.com/wix/react-native-zss-rich-text-editor/issues/178)
-
-## Inspirations
-
-For now, the original library has problems of using two deprecated modules, ListView and react-native-webview-bridge-updated. ListView problem is solved by [Ankit-96](https://github.com/Ankit-96) 's [PR](https://github.com/wix/react-native-zss-rich-text-editor/pull/179). So I focused on removing react-native-webview-bridge-updated and making use of react-native-webview.
-
-## What I did
-
--   Did just like what [Ankit-96](https://github.com/Ankit-96) did; replaced ListView with FlatList
--   Replaced react-native-webview-bridge-updated with react-native-webview
-    -   Instead of injecting `MessageHandler` into webpage(WebViewBridge) and sending message through `sendToBridge`, I directly inject `zss_editor`'s function calls through `injectJavaScript`. To achieve that, I fixed `WebViewMessageHandler.js` to be mapper function, translating functions of `RichTextEditor` to those of `zss_editor`.
-    -   In `editor.html`, replace `WebViewBridge.send` with `ReactNativeWebView.postMessage`
--   Added `./newExample`. You should `$ cd newExample; yarn; cd ios; pod install; cd ..; react-native run-ios;`.
-
 ## How to use it
 
--   `$ yarn add https://github.com/jb-/react-native-zss-rich-text-editor`
--   `$ yarn add react-native-webview` (I'm not sure why I have to do this)
--   `$ cd ios; pod install;`
-
-## Limitations
-
--   Tested on RN 0.61.5, iOS only.
-
--   Since I worked it for my project only, I did not test it on other versions or on Android platform. If any of you are familiar with both Android and iOS natives, please refer to my project and collaborate.
+-   `$ yarn add https://github.com/philpettican/react-native-zss-rich-text-editor`
+-   `$ yarn add react-native-webview`
+-   `$ cd ios && pod install`
 
 ## References
 
@@ -39,7 +19,10 @@ A fully functional Rich Text Editor for both Android and iOS, based off the [ZSS
 ## Installation
 
 ```
-npm i --save react-native-zss-rich-text-editor
+npm i --save https://github.com/philpettican/react-native-zss-rich-text-editor
+or
+yarn add https://github.com/philpettican/react-native-zss-rich-text-editor
+cd ios && pod install
 ```
 
 On Android, add the following to the end of your `android/app/build.gradle`
@@ -50,8 +33,6 @@ project.afterEvaluate {
     copyEditorHtmlToAppAssets(file('../../node_modules/react-native-zss-rich-text-editor'))
 }
 ```
-
-Also, follow instructions [here](https://github.com/alinz/react-native-webview-bridge) to add the native `react-native-webview-bridge-updated` dependency.
 
 ## Usage
 
@@ -117,8 +98,8 @@ The editor component. Simply place this component in your view hierarchy to rece
 -   `alignFull()`
 -   `insertBulletsList()`
 -   `insertOrderedList()`
--   `insertLink(url, title)`
--   `updateLink(url, title)`
+-   `insertLink(url, title, className)`
+-   `updateLink(url, title, className)`
 -   `insertImage(attributes)`
 -   `setSubscript()`
 -   `setSuperscript()`
@@ -171,6 +152,14 @@ To know when the title or content are in focus, use the following methods.
 -   `setContentBlurHandler(callbackHandler)`
 -   `isTitleFocused()`
 -   `isContentFocused()`
+
+To start the @mentioning process, use the following method:
+
+-   `startMention`
+
+To insert an @mention, first either type an @ character to start the @mentioning process or call the startMention method, then use the following method:
+
+-   `insertMention(url, title, className)`
 
 This method registers a function that will get called whenver the cursor position changes or a change is made to the styling of the editor at the cursor's position., The callback will be called with an array of `actions` that are active at the cusor position, allowing a toolbar to respond to changes.
 
@@ -235,13 +224,13 @@ Other props supported by the `RichTextToolbar` component are:
 
 -   `actions`
 
-        	An `array` of `actions` to be provided by this toolbar. The default actions are:
-        	* `actions.insertImage`
-        * `actions.setBold`
-        * `actions.setItalic`
-        * `actions.insertBulletsList`
-        * `actions.insertOrderedList`
-        * `actions.insertLink`
+    An `array` of `actions` to be provided by this toolbar. The default actions are:
+    _ `actions.insertImage`
+    _ `actions.setBold`
+    _ `actions.setItalic`
+    _ `actions.insertBulletsList`
+    _ `actions.insertOrderedList`
+    _ `actions.insertLink`
 
 -   `onPressAddLink`
 -   `onPressAddImage`
@@ -291,6 +280,7 @@ This is a set of consts of all supported actions. These will be passed in arrays
     	insertHTML: 'INSERT_HTML',
     	insertCSS: 'INSERT_CSS',
     	insertExternalCSS: 'INSERT_EXTERNAL_CSS',
+    	startMention: 'START_MENTION',
 
       	setBold: 'bold',
       	setItalic: 'italic',
