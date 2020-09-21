@@ -53,6 +53,7 @@ export default class RichTextEditor extends Component {
 			linkInitialUrl: '',
 			linkTitle: '',
 			linkUrl: '',
+			linkClassName: '',
 			keyboardHeight: 0,
 			isTitleFocused: false,
 			isContentFocused: false,
@@ -93,7 +94,6 @@ export default class RichTextEditor extends Component {
 	}
 
 	_onKeyboardWillShow(event) {
-		console.log('!!!!', event);
 		const newKeyboardHeight = event.endCoordinates.height;
 		if (this.state.keyboardHeight === newKeyboardHeight) {
 			return;
@@ -187,11 +187,21 @@ export default class RichTextEditor extends Component {
 					break;
 				case messages.LINK_TOUCHED:
 					this.prepareInsert();
-					const { title, url } = message.data;
-					this.showLinkDialog(title, url);
+					const { title, url, className } = message.data;
+					console.log('LINK_TOUCHED', message);
+					this.showLinkDialog(title, url, className);
 					break;
 				case messages.LOG:
-					console.log('FROM ZSS', message.data);
+					console.log('Log from ZSS', message.data);
+					break;
+				case messages.ENTER_MENTION:
+					this._onMentioning(message);
+					break;
+				case messages.MENTION_TEXT_CHANGED:
+					this._onMentioning(message);
+					break;
+				case messages.EXIT_MENTION:
+					this._onFinishMention();
 					break;
 				case messages.SCROLL:
 					this.webview.setNativeProps({
@@ -329,11 +339,13 @@ export default class RichTextEditor extends Component {
 							this.insertLink(
 								this.state.linkUrl,
 								this.state.linkTitle,
+								this.state.linkClassName,
 							);
 						} else {
 							this.updateLink(
 								this.state.linkUrl,
 								this.state.linkTitle,
+								this.state.linkClassName,
 							);
 						}
 						this._hideModal();
@@ -402,19 +414,28 @@ export default class RichTextEditor extends Component {
 	};
 
 	_sendAction(action, data) {
-		const escapedData = typeof data === 'string' ? this.escapeJSONString(data) : data;
-		const jsToBeExecutedOnPage = MessageConverter({ type: action, data: escapedData });
+		const escapedData =
+			typeof data === 'string' ? this.escapeJSONString(data) : data;
+		const jsToBeExecutedOnPage = MessageConverter({
+			type: action,
+			data: escapedData,
+		});
 		this.webview.injectJavaScript(`${jsToBeExecutedOnPage};true;`);
 	}
 
 	//-------------------------------------------------------------------------------
 	//--------------- Public API
 
-	showLinkDialog(optionalTitle = '', optionalUrl = '') {
+	showLinkDialog(
+		optionalTitle = '',
+		optionalUrl = '',
+		optionalClassName = '',
+	) {
 		this.setState({
 			linkInitialUrl: optionalUrl,
 			linkTitle: optionalTitle,
 			linkUrl: optionalUrl,
+			linkClassName: optionalClassName,
 			showLinkDialog: true,
 		});
 	}
@@ -556,12 +577,12 @@ export default class RichTextEditor extends Component {
 		this._sendAction(actions.insertOrderedList);
 	}
 
-	insertLink(url, title) {
-		this._sendAction(actions.insertLink, { url, title });
+	insertLink(url, title, className) {
+		this._sendAction(actions.insertLink, { url, title, className });
 	}
 
-	updateLink(url, title) {
-		this._sendAction(actions.updateLink, { url, title });
+	updateLink(url, title, className) {
+		this._sendAction(actions.updateLink, { url, title, className });
 	}
 
 	insertImage(attributes) {
@@ -702,35 +723,47 @@ export default class RichTextEditor extends Component {
 	}
 
 	_titleFocusHandler() {
-		this.setState({
-			isTitleFocused: true,
-		}, () => {
-			this.titleFocusHandler && this.titleFocusHandler();
-		});
-	};
+		this.setState(
+			{
+				isTitleFocused: true,
+			},
+			() => {
+				this.titleFocusHandler && this.titleFocusHandler();
+			},
+		);
+	}
 
 	_titleBlurHandler() {
-		this.setState({
-			isTitleFocused: false,
-		}, () => {
-			this.titleBlurHandler && this.titleBlurHandler();
-		});
+		this.setState(
+			{
+				isTitleFocused: false,
+			},
+			() => {
+				this.titleBlurHandler && this.titleBlurHandler();
+			},
+		);
 	}
 
 	_contentFocusHandler() {
-		this.setState({
-			isContentFocused: true,
-		}, () => {
-			this.contentFocusHandler && this.contentFocusHandler();
-		});
+		this.setState(
+			{
+				isContentFocused: true,
+			},
+			() => {
+				this.contentFocusHandler && this.contentFocusHandler();
+			},
+		);
 	}
 
 	_contentBlurHandler() {
-		this.setState({
-			isContentFocused: false,
-		}, () => {
-			this.contentBlurHandler && this.contentBlurHandler();
-		});
+		this.setState(
+			{
+				isContentFocused: false,
+			},
+			() => {
+				this.contentBlurHandler && this.contentBlurHandler();
+			},
+		);
 	}
 
 	setTitleFocusHandler(callbackHandler) {
@@ -751,6 +784,45 @@ export default class RichTextEditor extends Component {
 
 	addSelectedTextChangeListener(listener) {
 		this._selectedTextChangeListeners.push(listener);
+	}
+
+	insertHTML(html) {
+		this._sendAction(actions.insertHTML, html);
+	}
+
+	insertCSS(css) {
+		this._sendAction(actions.insertCSS, css);
+	}
+
+	insertExternalCSS(uri) {
+		this._sendAction(actions.insertExternalCSS, uri);
+	}
+
+	startMention() {
+		this._sendAction(actions.startMention);
+	}
+
+	insertMention(url, title, className) {
+		this._sendAction(actions.insertMention, { url, title, className });
+	}
+
+	_onMentioning(message) {
+		if (!this.props.onMentioning) {
+			return;
+		}
+
+		const {
+			data: { text = '' },
+		} = message;
+		this.props.onMentioning(text);
+	}
+
+	_onFinishMention() {
+		if (!this.props.onFinishMention) {
+			return;
+		}
+
+		this.props.onFinishMention();
 	}
 }
 
@@ -788,6 +860,7 @@ const styles = StyleSheet.create({
 	input: {
 		height: PlatformIOS ? 20 : 40,
 		paddingTop: 0,
+		color: 'black',
 	},
 	lineSeparator: {
 		height: 1 / PixelRatio.get(),
