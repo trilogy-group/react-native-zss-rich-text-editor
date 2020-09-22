@@ -115,7 +115,8 @@ export default class RichTextEditor extends Component {
 		const { marginTop = 0, marginBottom = 0 } = this.props.style;
 		const spacing = marginTop + marginBottom + top + bottom;
 
-		const editorAvailableHeight = Dimensions.get('window').height - keyboardHeight * 2 - spacing;
+		const editorAvailableHeight =
+			Dimensions.get('window').height - keyboardHeight * 2 - spacing;
 		this.setEditorHeight(editorAvailableHeight);
 	}
 
@@ -803,7 +804,16 @@ export default class RichTextEditor extends Component {
 	}
 
 	insertMention(url, title, className) {
-		this._sendAction(actions.insertMention, { url, title, className });
+		const escapedUrl = url ? this.escapeJSONString(url) : url;
+		const escapedTitle = title ? this.escapeJSONString(title) : title;
+		const escapedClassName = className
+			? this.escapeJSONString(className)
+			: className;
+		this._sendAction(actions.insertMention, {
+			url: escapedUrl,
+			title: escapedTitle,
+			className: escapedClassName,
+		});
 	}
 
 	_onMentioning(message) {

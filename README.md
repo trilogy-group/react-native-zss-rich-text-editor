@@ -155,7 +155,7 @@ To know when the title or content are in focus, use the following methods.
 
 To start the @mentioning process, use the following method:
 
--   `startMention`
+-   `startMention()`
 
 To insert an @mention, first either type an @ character to start the @mentioning process or call the startMention method, then use the following method:
 
@@ -164,6 +164,22 @@ To insert an @mention, first either type an @ character to start the @mentioning
 This method registers a function that will get called whenver the cursor position changes or a change is made to the styling of the editor at the cursor's position., The callback will be called with an array of `actions` that are active at the cusor position, allowing a toolbar to respond to changes.
 
 -   `registerToolbar(listener)`
+
+## Testing changes using the example app
+
+-   Install `yalc` globally. See https://www.npmjs.com/package/yalc for more details
+-   `$ yarn`
+-   `$ cd ios && pod install && cd ..`
+-   `$ bash build.sh`
+-   `$ react-native run-ios`
+-   or
+-   `$ react-native run-android`
+-   In order for the example app to refresh with the latest changes, you need to:
+-   re-run `$ bash build.sh`
+-   Stop and restart the metro bundler and then run
+-   `$ react-native run-ios`
+-   or
+-   `$ react-native run-android`
 
 ### Example Usage:
 

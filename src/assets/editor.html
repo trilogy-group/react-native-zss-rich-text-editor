@@ -8705,7 +8705,7 @@
 				// Next line is comented to prevent deselecting selection. It looks like work but if there are any issues will appear then uconmment it as well as code above.
 				//sel.collapseToStart();
 				var range = sel.getRangeAt(0);
-				var span = document.createElement('span');// something happening here preventing selection of elements
+				var span = document.createElement('span'); // something happening here preventing selection of elements
 				if (zss_editor.isUsingiOS) {
 					range.collapse(false);
 				}
@@ -8973,7 +8973,7 @@
 				/* zss_editor.log(`insertExternalCSS: ${uri}`); */
 				const link = document.createElement('link');
 				link.setAttribute('rel', 'stylesheet');
-				link.setAttribute('href', uri);
+				link.setAttribute('href', encodeHtmlEntities(uri));
 				link.onerror = () => {
 					zss_editor.log(`insertExternalCSS: ${uri} link failed`);
 				};
@@ -9005,8 +9005,8 @@
 
 				if (zss_editor.currentEditingLink) {
 					var c = zss_editor.currentEditingLink;
-					c.attr('href', url);
-					c.attr('class', className);
+					c.attr('href', encodeHtmlEntities(url));
+					c.attr('class', encodeHtmlEntities(className));
 					c.text(title);
 				}
 				zss_editor.enabledEditingItems();
@@ -9017,9 +9017,12 @@
 					`insertMention('${url}', '${title}', '${className}')`,
 				); */
 				var mentionLinkElement = document.createElement('a');
-				mentionLinkElement.className = className;
-				mentionLinkElement.setAttribute('href', url);
-				mentionLinkElement.textContent = title;
+				mentionLinkElement.className = encodeHtmlEntities(className);
+				mentionLinkElement.setAttribute(
+					'href',
+					encodeHtmlEntities(url),
+				);
+				mentionLinkElement.textContent = encodeHtmlEntities(title);
 				var space = document.createElement('span');
 				space.innerHTML = '\xa0';
 				zss_editor.replaceMentionWithElement(mentionLinkElement);
