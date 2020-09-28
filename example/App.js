@@ -19,6 +19,8 @@ export default class RichTextExample extends Component {
 	state = {
 		mentionListVisible: false,
 		mentionSearchText: '',
+		content:
+			'Hello <b>World</b> <p>this is a new paragraph</p> <p>this is another new paragraph</p>',
 	};
 
 	constructor(props) {
@@ -28,6 +30,7 @@ export default class RichTextExample extends Component {
 		this.onMentioning = this.onMentioning.bind(this);
 		this.onFinishMention = this.onFinishMention.bind(this);
 		this.onListItemPress = this.onListItemPress.bind(this);
+		this.onContentChange = this.onContentChange.bind(this);
 	}
 
 	onMentioning(text) {
@@ -45,9 +48,9 @@ export default class RichTextExample extends Component {
 	}
 
 	onListItemPress(item, index, items) {
-		console.log('item', item);
-		console.log('index', index);
-		console.log('items', items);
+		//console.log('item', item);
+		//console.log('index', index);
+		//console.log('items', items);
 
 		const { name } = item;
 		this.richtext.insertMention(
@@ -73,6 +76,8 @@ export default class RichTextExample extends Component {
 	}
 
 	render() {
+		const { content } = this.state;
+
 		return (
 			<View style={styles.container}>
 				{false && this.renderInsertHTMLTest()}
@@ -82,9 +87,8 @@ export default class RichTextExample extends Component {
 					ref={r => (this.richtext = r)}
 					style={styles.richText}
 					initialTitleHTML={'Title!!'}
-					initialContentHTML={
-						'Hello <b>World</b> <p>this is a new paragraph</p> <p>this is another new paragraph</p>'
-					}
+					enableOnChange={true}
+					initialContentHTML={content}
 					editorInitializedCallback={() => this.onEditorInitialized()}
 					customCSS={CSS}
 					onMentioning={this.onMentioning}
@@ -98,6 +102,7 @@ export default class RichTextExample extends Component {
 
 	onEditorInitialized() {
 		this.setFocusHandlers();
+		this.setContentChangeListener();
 		this.getHTML();
 		this.richtext.insertExternalCSS(EXTERNAL_CSS);
 	}
@@ -134,6 +139,17 @@ export default class RichTextExample extends Component {
 		this.richtext.setContentBlurHandler(() => {
 			//alert('content blur');
 			//console.log(`isContentFocused: ${this.richtext.isContentFocused()}`);
+		});
+	}
+
+	setContentChangeListener() {
+		this.richtext.registerContentChangeListener(this.onContentChange);
+	}
+
+	onContentChange(value) {
+		//console.log('onContentChange', value);
+		this.setState({
+			content: value,
 		});
 	}
 
