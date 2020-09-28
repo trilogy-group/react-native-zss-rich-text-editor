@@ -9325,7 +9325,7 @@
 				// Use jQuery to figure out those that are not supported
 				if (typeof e != 'undefined') {
 					// The target element
-					var s = zss_editor.getSelectedNode();
+					var s = zss_editor.getSelectedNode() || e.target;
 					var t = $(s);
 					var nodeName = e.target.nodeName.toLowerCase();
 
