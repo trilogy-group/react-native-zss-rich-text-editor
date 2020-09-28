@@ -165,22 +165,6 @@ This method registers a function that will get called whenver the cursor positio
 
 -   `registerToolbar(listener)`
 
-## Testing changes using the example app
-
--   Install `yalc` globally. See https://www.npmjs.com/package/yalc for more details
--   `$ yarn`
--   `$ cd ios && pod install && cd ..`
--   `$ bash build.sh`
--   `$ react-native run-ios`
--   or
--   `$ react-native run-android`
--   In order for the example app to refresh with the latest changes, you need to:
--   re-run `$ bash build.sh`
--   Stop and restart the metro bundler and then run
--   `$ react-native run-ios`
--   or
--   `$ react-native run-android`
-
 ### Example Usage:
 
 ```javascript
