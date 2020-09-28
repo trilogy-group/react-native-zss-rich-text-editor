@@ -8535,7 +8535,7 @@
 				$(document).on('selectionchange', function(e) {
 					// add by xukj - fix cannot set bold/italic on android
 					if (document.getSelection() != '') {
-						zss_editor.log('selectionchange'); // log
+						/* zss_editor.log('selectionchange'); */
 						zss_editor.calculateEditorHeightWithCaretPosition();
 						zss_editor.setScrollPosition();
 						zss_editor.enabledEditingItems(e);
@@ -8545,7 +8545,7 @@
 
 				// Make sure that when we tap anywhere in the document we focus on the editor
 				$(window).on('touchmove', function(e) {
-					zss_editor.log('touchmove'); // log
+					/* zss_editor.log('touchmove'); */
 					zss_editor.isDragging = true;
 					zss_editor.updateScrollOffset = true;
 					zss_editor.setScrollPosition();
