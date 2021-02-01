@@ -52,9 +52,9 @@ export default class RichTextExample extends Component {
 		//console.log('index', index);
 		//console.log('items', items);
 
-		const { name } = item;
+		const { name, website } = item;
 		this.richtext.insertMention(
-			`https://www.google.com/${index++}`,
+			website,
 			name,
 			'my-custom-class',
 		);
