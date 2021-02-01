@@ -8995,7 +8995,6 @@
 				/* zss_editor.log(
 					`insertMention('${url}', '${title}', '${className}')`,
 				); */
-				zss_editor.removeMentionRemains();
 				var mentionLinkElement = document.createElement('a');
 				mentionLinkElement.className = encodeHtmlEntities(className);
 				mentionLinkElement.setAttribute(
@@ -9008,6 +9007,7 @@
 					false,
 					mentionLinkElement.outerHTML,
 				);
+				zss_editor.removeMentionRemains();
 				var space = document.createElement('span');
 				space.innerHTML = '\xa0';
 				document.execCommand('insertHTML', false, space.outerHTML);
