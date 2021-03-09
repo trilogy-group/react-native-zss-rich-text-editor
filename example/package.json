@@ -14,7 +14,8 @@
 		"react-native": "0.61.5",
 		"react-native-keyboard-spacer": "^0.4.1",
 		"react-native-webview": "^8.1.2",
-		"react-native-zss-rich-text-editor": "file:.yalc/react-native-zss-rich-text-editor"
+		"react-native-zss-rich-text-editor": "file:.yalc/react-native-zss-rich-text-editor",
+		"yalc": "^1.0.0-pre.50"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.7.7",
