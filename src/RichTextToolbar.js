@@ -8,27 +8,27 @@ import {
 	StyleSheet,
 } from 'react-native';
 
-import { actions } from './const';
+import { actions as rteActions } from './const';
 
 const defaultActions = [
-	actions.startMention,
-	actions.insertImage,
-	actions.setBold,
-	actions.setItalic,
-	actions.insertBulletsList,
-	actions.insertOrderedList,
-	actions.insertLink,
+	rteActions.startMention,
+	rteActions.insertImage,
+	rteActions.setBold,
+	rteActions.setItalic,
+	rteActions.insertBulletsList,
+	rteActions.insertOrderedList,
+	rteActions.insertLink,
 ];
 
 function getDefaultIcon() {
 	const texts = {};
-	texts[actions.startMention] = require('../img/icon_mention.png');
-	texts[actions.insertImage] = require('../img/icon_format_media.png');
-	texts[actions.setBold] = require('../img/icon_format_bold.png');
-	texts[actions.setItalic] = require('../img/icon_format_italic.png');
-	texts[actions.insertBulletsList] = require('../img/icon_format_ul.png');
-	texts[actions.insertOrderedList] = require('../img/icon_format_ol.png');
-	texts[actions.insertLink] = require('../img/icon_format_link.png');
+	texts[rteActions.startMention] = require('../img/icon_mention.png');
+	texts[rteActions.insertImage] = require('../img/icon_format_media.png');
+	texts[rteActions.setBold] = require('../img/icon_format_bold.png');
+	texts[rteActions.setItalic] = require('../img/icon_format_italic.png');
+	texts[rteActions.insertBulletsList] = require('../img/icon_format_ul.png');
+	texts[rteActions.insertOrderedList] = require('../img/icon_format_ol.png');
+	texts[rteActions.insertLink] = require('../img/icon_format_link.png');
 	return texts;
 }
 
@@ -46,16 +46,17 @@ export default class RichTextToolbar extends Component {
 		iconMap: PropTypes.object,
 	};
 
+	getData = (actions, selectedItems) => {
+		return actions.map(action => {
+			return { action, selected: selectedItems.includes(action) };
+		});
+	};
+
 	constructor(props) {
 		super(props);
-		const actions = this.props.actions
-			? this.props.actions
-			: defaultActions;
 		this.state = {
 			editor: undefined,
 			selectedItems: [],
-			actions,
-			dataSet: this.getRows(actions, []),
 		};
 	}
 
@@ -81,7 +82,6 @@ export default class RichTextToolbar extends Component {
 		if (selectedItems !== this.state.selectedItems) {
 			this.setState({
 				selectedItems,
-				dataSet: this.getRows(this.state.actions, selectedItems),
 			});
 		}
 	}
@@ -114,7 +114,7 @@ export default class RichTextToolbar extends Component {
 			<TouchableOpacity
 				key={action}
 				style={[
-					{ height: 50, width: 50, justifyContent: 'center' },
+					{ height: 50, width: 50, justifyContent: 'center', alignItems: 'center' },
 					selected
 						? this._getButtonSelectedStyle()
 						: this._getButtonUnselectedStyle(),
@@ -142,6 +142,8 @@ export default class RichTextToolbar extends Component {
 	}
 
 	render() {
+		const data = this.getData(this.props.actions || defaultActions, this.state.selectedItems);
+
 		return (
 			<View
 				style={[
@@ -154,12 +156,12 @@ export default class RichTextToolbar extends Component {
 				]}
 			>
 				<FlatList
-					data={this.state.dataSet}
-					numColumns={this.state.actions.length}
+					data={data}
+					horizontal
 					renderItem={item =>
 						this._renderAction(item.item.action, item.item.selected)
 					}
-					keyExtractor={(item, index) => index}
+					keyExtractor={(item, index) => `key-${index}`}
 				/>
 			</View>
 		);
@@ -167,33 +169,33 @@ export default class RichTextToolbar extends Component {
 
 	_onPress(action) {
 		switch (action) {
-			case actions.setBold:
-			case actions.setItalic:
-			case actions.insertBulletsList:
-			case actions.insertOrderedList:
-			case actions.setUnderline:
-			case actions.heading1:
-			case actions.heading2:
-			case actions.heading3:
-			case actions.heading4:
-			case actions.heading5:
-			case actions.heading6:
-			case actions.setParagraph:
-			case actions.removeFormat:
-			case actions.alignLeft:
-			case actions.alignCenter:
-			case actions.alignRight:
-			case actions.alignFull:
-			case actions.setSubscript:
-			case actions.setSuperscript:
-			case actions.setStrikethrough:
-			case actions.setHR:
-			case actions.setIndent:
-			case actions.setOutdent:
-			case actions.startMention:
+			case rteActions.setBold:
+			case rteActions.setItalic:
+			case rteActions.insertBulletsList:
+			case rteActions.insertOrderedList:
+			case rteActions.setUnderline:
+			case rteActions.heading1:
+			case rteActions.heading2:
+			case rteActions.heading3:
+			case rteActions.heading4:
+			case rteActions.heading5:
+			case rteActions.heading6:
+			case rteActions.setParagraph:
+			case rteActions.removeFormat:
+			case rteActions.alignLeft:
+			case rteActions.alignCenter:
+			case rteActions.alignRight:
+			case rteActions.alignFull:
+			case rteActions.setSubscript:
+			case rteActions.setSuperscript:
+			case rteActions.setStrikethrough:
+			case rteActions.setHR:
+			case rteActions.setIndent:
+			case rteActions.setOutdent:
+			case rteActions.startMention:
 				this.state.editor._sendAction(action);
 				break;
-			case actions.insertLink:
+			case rteActions.insertLink:
 				this.state.editor.prepareInsert();
 				if (this.props.onPressAddLink) {
 					this.props.onPressAddLink();
@@ -203,12 +205,11 @@ export default class RichTextToolbar extends Component {
 					});
 				}
 				break;
-			case actions.insertImage:
+			case rteActions.insertImage:
 				this.state.editor.prepareInsert();
 				if (this.props.onPressAddImage) {
 					this.props.onPressAddImage();
 				}
-				break;
 				break;
 		}
 	}
