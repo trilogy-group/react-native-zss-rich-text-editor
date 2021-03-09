@@ -8,7 +8,7 @@ import {
 	Switch,
 	Text,
 	TouchableOpacity,
-	View
+	View,
 } from 'react-native';
 import {
 	RichTextEditor,
@@ -73,7 +73,9 @@ export default class RichTextExample extends Component {
 		this.onFinishMention = this.onFinishMention.bind(this);
 		this.onListItemPress = this.onListItemPress.bind(this);
 		this.onContentChange = this.onContentChange.bind(this);
-		this.toggleToolbarActionPanelVisibility = this.toggleToolbarActionPanelVisibility.bind(this);
+		this.toggleToolbarActionPanelVisibility = this.toggleToolbarActionPanelVisibility.bind(
+			this,
+		);
 		this.toggleActionVisibility = this.toggleActionVisibility.bind(this);
 	}
 
@@ -97,11 +99,7 @@ export default class RichTextExample extends Component {
 		//console.log('items', items);
 
 		const { name, website } = item;
-		this.richtext.insertMention(
-			website,
-			name,
-			'my-custom-class',
-		);
+		this.richtext.insertMention(website, name, 'my-custom-class');
 	}
 
 	renderMentionList() {
@@ -141,8 +139,9 @@ export default class RichTextExample extends Component {
 
 	toggleToolbarActionPanelVisibility() {
 		this.setState({
-			toggleToolbarActionPanelVisibile: !this.state.toggleToolbarActionPanelVisibile,
-		})
+			toggleToolbarActionPanelVisibile: !this.state
+				.toggleToolbarActionPanelVisibile,
+		});
 	}
 
 	renderToolbarActionTogglePanel() {
@@ -150,24 +149,42 @@ export default class RichTextExample extends Component {
 
 		return (
 			<View>
-				<Button title={toggleToolbarActionPanelVisibile ? 'Hide toolbar action toggle panel' : 'Show toolbar action toggle panel'} onPress={this.toggleToolbarActionPanelVisibility}></Button>
-				{toggleToolbarActionPanelVisibile && <ScrollView>
-					{this.state.actions.map(i => {
-						const { action, visible } = i;
+				<Button
+					title={
+						toggleToolbarActionPanelVisibile
+							? 'Hide toolbar action toggle panel'
+							: 'Show toolbar action toggle panel'
+					}
+					onPress={this.toggleToolbarActionPanelVisibility}
+				></Button>
+				{toggleToolbarActionPanelVisibile && (
+					<ScrollView>
+						{this.state.actions.map(i => {
+							const { action, visible } = i;
 
-						const onPress = () => {
-							this.toggleActionVisibility(action);
-						};
+							const onPress = () => {
+								this.toggleActionVisibility(action);
+							};
 
-						return (
-							<TouchableOpacity onPress={onPress} key={action} style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-								<Text>{action}</Text>
-								<Switch value={visible} onValueChange={onPress}></Switch>
-							</TouchableOpacity>
-						);
-					})}
-					
-				</ScrollView>}
+							return (
+								<TouchableOpacity
+									onPress={onPress}
+									key={action}
+									style={{
+										flexDirection: 'row',
+										justifyContent: 'space-between',
+									}}
+								>
+									<Text>{action}</Text>
+									<Switch
+										value={visible}
+										onValueChange={onPress}
+									></Switch>
+								</TouchableOpacity>
+							);
+						})}
+					</ScrollView>
+				)}
 			</View>
 		);
 	}
@@ -190,12 +207,17 @@ export default class RichTextExample extends Component {
 						initialTitleHTML={'Title!!'}
 						enableOnChange={true}
 						initialContentHTML={content}
-						editorInitializedCallback={() => this.onEditorInitialized()}
+						editorInitializedCallback={() =>
+							this.onEditorInitialized()
+						}
 						customCSS={CSS}
 						onMentioning={this.onMentioning}
 						onFinishMention={this.onFinishMention}
 					/>
-					<RichTextToolbar getEditor={() => this.richtext} actions={actions} />
+					<RichTextToolbar
+						getEditor={() => this.richtext}
+						actions={actions}
+					/>
 					{Platform.OS === 'ios' && <KeyboardSpacer />}
 				</View>
 			</SafeAreaView>
