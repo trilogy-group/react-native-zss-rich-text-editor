@@ -1,4 +1,4 @@
-package com.example;
+package com.zss.rich.text.editor.example;
 
 import com.facebook.react.ReactActivity;
 
