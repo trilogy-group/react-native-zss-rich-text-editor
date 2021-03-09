@@ -1,4 +1,4 @@
 cd ..
 yalc publish
 cd example/
-yalc link react-native-zss-rich-text-editor
+yalc add react-native-zss-rich-text-editor
