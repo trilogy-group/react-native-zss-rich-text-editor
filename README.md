@@ -4,7 +4,7 @@
 
 ## How to use it
 
--   `$ yarn add https://github.com/philpettican/react-native-zss-rich-text-editor`
+-   `$ yarn add https://github.com/trilogy-group/react-native-zss-rich-text-editor`
 -   `$ yarn add react-native-webview`
 -   `$ cd ios && pod install`
 
@@ -19,9 +19,9 @@ A fully functional Rich Text Editor for both Android and iOS, based off the [ZSS
 ## Installation
 
 ```
-npm i --save https://github.com/philpettican/react-native-zss-rich-text-editor
+npm i --save https://github.com/trilogy-group/react-native-zss-rich-text-editor
 or
-yarn add https://github.com/philpettican/react-native-zss-rich-text-editor
+yarn add https://github.com/trilogy-group/react-native-zss-rich-text-editor
 cd ios && pod install
 ```
 
@@ -324,4 +324,6 @@ This is a set of consts of all supported actions. These will be passed in arrays
 
 ## Attribution
 
-`react-native-zss-rich-text-editor` is a wrapper around the amazing [ZSSRichTextEditor](https://github.com/nnhubbard/ZSSRichTextEditor/tree/master/ZSSRichTextEditor) project. It also communicates with the editor using (a tiny fork) of the awesome [react-native-webview-bridge](https://github.com/alinz/react-native-webview-bridge) project.
+`react-native-zss-rich-text-editor` is a wrapper around the amazing [ZSSRichTextEditor](https://github.com/nnhubbard/ZSSRichTextEditor/tree/master/ZSSRichTextEditor) project. It also communicates with the editor using (a tiny fork) of the awesome [react-native-webview-bridge](https://github.com/alinz/react-native-webview-bridge) project. 
+
+This fork is also based on philpettican fork (https://github.com/philpettican/react-native-zss-rich-text-editor)
