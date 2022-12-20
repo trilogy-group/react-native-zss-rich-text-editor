@@ -844,7 +844,7 @@ const styles = StyleSheet.create({
 		backgroundColor: 'rgba(0, 0, 0, 0.5)',
 	},
 	innerModal: {
-		backgroundColor: 'rgba(255, 255, 255, 0.9)',
+		backgroundColor: 'rgba(255, 255, 255, 1)',
 		paddingTop: 20,
 		paddingBottom: PlatformIOS ? 0 : 20,
 		paddingLeft: 20,
