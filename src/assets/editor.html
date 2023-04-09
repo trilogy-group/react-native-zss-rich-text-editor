@@ -8907,7 +8907,9 @@
 			};
 
 			zss_editor.setFontFamily = function(fontFamily) {
-				zss_editor.restorerange();
+				if (zss_editor.currentSelection) {
+					zss_editor.restorerange();
+				}
 				document.execCommand('styleWithCSS', null, true);
 				document.execCommand('fontName', false, fontFamily);
 				document.execCommand('styleWithCSS', null, false);
@@ -9138,7 +9140,16 @@
 				zss_editor.restorerange();
 				var imageContainer = $('<div><img></div>');
 				imageContainer.find('img').attr(attributes);
-				zss_editor.insertHTML('<br>' + imageContainer.html() + '<br>');
+				var html = [];
+				if (attributes.inlineimage) {
+					html.push('<br>');
+				}
+				html.push(imageContainer.html());
+				if (attributes.inlineimage) {
+					html.push('<br>');
+				}
+				html = html.join('');
+				zss_editor.insertHTML(html);
 				zss_editor.enabledEditingItems();
 			};
 
