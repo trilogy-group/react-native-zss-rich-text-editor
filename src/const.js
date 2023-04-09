@@ -18,7 +18,6 @@ export const actions = {
   insertExternalCSS: 'INSERT_EXTERNAL_CSS',
   insertMention: 'INSERT_MENTION',
   startMention: 'START_MENTION',
-
   setBold: 'bold',
   setItalic: 'italic',
   setUnderline: 'underline',
@@ -39,6 +38,7 @@ export const actions = {
   insertLink: 'INST_LINK',
   updateLink: 'UPDATE_LINK',
   insertImage: 'INST_IMAGE',
+  insertVideo: 'INST_VIDEO',
   setSubscript: 'subscript',
   setSuperscript: 'superscript',
   setStrikethrough: 'strikeThrough',
